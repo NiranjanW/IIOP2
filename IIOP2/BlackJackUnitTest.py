@@ -36,7 +36,7 @@ class Card(object):
 
 #####################################################
 # Student should insert code for Hand class here
-in_play = False
+in_play = True
 outcome = ""
 score = 0
 player_hand =""
@@ -81,6 +81,7 @@ class Hand(object):
 
     def add_card(self, card):
         self.hand_card.append(card)
+        #self.hand_card.extend(card)
 
     # def get_value(self):
     #     hand_value = 0
@@ -142,13 +143,27 @@ class Deck(object):
 def deal():
     global outcome, in_play, player_hand , dealer_hand
     player_hand = Hand()
+    dealer_hand = Hand()
     deck = Deck ()
     deck.shuffle()
     for i in range(2):
-        player_hand = deck.deal_card()
-#        deck.deck_hand.pop(player_hand)
-    in_play = True
-    print  player_hand
+        player_hand.add_card(deck.deal_card())
+        #deck.deck_hand.pop(player_hand[i])
+        dealer_hand.add_card( deck.deal_card())
+
+    if in_play:
+        if player_hand.get_value() <= 21:
+            player_hand.add_card(deck.deal_card())
+            print player_hand
+        else :
+            print 'BUST'
+            in_play = False
+
+    print player_hand.get_value() , dealer_hand.get_value()
+    return   str(player_hand) ,  str(dealer_hand)
+
+
+       #, player_hand.get_value
 
 def hit():
     pass	# replace with your code below
@@ -173,25 +188,25 @@ def stand():
 # c1 = test_deck.deal_card()
 # print c1
 # print type(c1)
-# print test_deck
+# #print test_deck
 #
 # c2 = test_deck.deal_card()
 # print c2
 # print type(c2)
-# print test_deck
+# #print test_deck
 #
 # test_deck = Deck()
 # print test_deck
 # test_deck.shuffle()
-# print test_deck
+# #print test_deck
 # print type(test_deck)
 #
 # c3 = test_deck.deal_card()
 # print c3
 # print type(c3)
 # print test_deck
-# print '**************'
-# deal()
+print '**************'
+print deal()
 
 
 ###################################################
@@ -223,28 +238,28 @@ def stand():
 ###################################################
 # Test Hand code
 #############################################
-c1 = Card("S", "A")
-c2 = Card("C", "2")
-c3 = Card("D", "T")
-print c1, c2, c3
-print type(c1), type(c2), type(c3)
+# c1 = Card("S", "A")
+# c2 = Card("C", "2")
+# c3 = Card("D", "T")
+# print c1, c2, c3
+# print type(c1), type(c2), type(c3)
 
-test_hand = Hand()
-print test_hand
-
-
-test_hand.add_card(c1)
-print test_hand
-
-
-test_hand.add_card(c2)
-print test_hand
-
-test_hand.add_card(c3)
-print test_hand
-
-print type(test_hand)
-print test_hand.get_value()
+# test_hand = Hand()
+# #print test_hand
+#
+#
+# test_hand.add_card(c1)
+# #print test_hand
+#
+#
+# test_hand.add_card(c2)
+# #print test_hand
+#
+# test_hand.add_card(c3)
+# #print test_hand
+#
+# #print type(test_hand)
+# print test_hand.get_value()
 
 
 ###################################################
