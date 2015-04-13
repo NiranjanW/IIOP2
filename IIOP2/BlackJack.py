@@ -17,6 +17,11 @@ card_back = simplegui.load_image("http://storage.googleapis.com/codeskulptor-ass
 in_play = False
 outcome = ""
 score = 0
+player_hand, dealer_hand ='', ''
+wins = 0
+losses = 0
+deck= None
+
 
 # define globals for cards
 SUITS = ('C', 'S', 'H', 'D')
@@ -53,6 +58,8 @@ class Card:
 class Hand:
     def __init__(self):
         self.hand_card = []
+        #self.top_left_pos = pos
+
 
     def __str__(self):
        for idx in range(len(self.hand_card)):
@@ -63,36 +70,115 @@ class Hand:
 
     def get_value(self):
         # count aces as 1, if the hand has an ace, then add 10 to hand value if it doesn't bust
-        pass	# compute the value of the hand, see Blackjack video
+        # compute the value of the hand, see Blackjack video
+        value =0
+        for idx in self.hand_card:
+            value += VALUES.get(idx.get_rank())
+            if idx.get_rank != 'A':
+                return value
+            else:
+                if value +10 <=21 :
+                   return value + 10
+                else:
+                   return value
 
-    def draw(self, canvas, pos):
-        pass	# draw a hand on the canvas, use the draw method for cards
+
+    # def draw(self, canvas, pos):
+    #     # draw a hand on the canvas, use the draw method for cards
+    #     # for card in self.hand_card:
+    #     #     card.draw(canvas,pos)
+    #     self.top_left_pos = pos
+    #     # i = 0
+        # # if in play, draw cover for first position
+        # for card in self.hand_card:
+        #         i += 1
+        #         if i > 1:
+        #             card.draw(canvas, [pos[0]+(CARD_SIZE[0]+10)*(i-1), pos[1]])
+        #         else:
+        #             for car in self.hand_card:
+        #                 i +=1
+        #                 card.draw(canvas, [pos[0]+(CARD_SIZE[0]+10)*(i-1), pos[1]])
+        # if cover:
+        #     for card in self.cards:
+        #         i += 1
+        #         if i > 1:
+        #             card.draw(canvas, [pos[0]+(CARD_SIZE[0]+10)*(i-1), pos[1]])
+        # else:
+        #     for card in self.cards:
+        #         i += 1
+        #         card.draw(canvas, [pos[0]+(CARD_SIZE[0]+10)*(i-1), pos[1]])
 
 
+    def draw(self, canvas, cover, pos):
+        i = 0
+        # if in play, draw cover for first position
+        if cover:
+            for card in self.hand_card:
+                i += 1
+                if i > 1:
+                    card.draw(canvas, [pos[0]+(CARD_SIZE[0]+10)*(i-1), pos[1]])
+        else:
+            for card in self.hand_card:
+                i += 1
+                card.draw(canvas, [pos[0]+(CARD_SIZE[0]+10)*(i-1), pos[1]])
+    # def draw(self, canvas):
+    #    #self.top_left_pos = pos
+    #    for i, c in enumerate(self.hand_card):
+    #        c.draw(canvas, [self.top_left_pos[0] + CARD_SIZE[0] * i, self.top_left_pos[1]])
 # define deck class
 class Deck:
+    #global deck
     def __init__(self):
-        pass	# create a Deck object
+
+        # create a Deck object
+        self.deck =[]
+        for i in range(len(SUITS)):
+            for j in range(len(RANKS)):
+                card = Card(SUITS[i],RANKS[j])
+                self.deck.append(card)
+
+
 
     def shuffle(self):
         # shuffle the deck
-        pass    # use random.shuffle()
+        # use random.shuffle()
+        random.shuffle(self.deck)
 
     def deal_card(self):
-        pass	# deal a card object from the deck
+        # deal a card object from the deck
+        #return random.choice(self.deck)
+        return self.deck.pop()
 
     def __str__(self):
-        pass	# return a string representing the deck
+        # return a string representing the deck
+        ans =''
+        for i in range(len(self.deck)):
+            deck_card = self.deck[i]
+            ans += str(deck_card) + ' '
+        return ans
 
 
 
 #define event handlers for buttons
 def deal():
-    global outcome, in_play
+    global outcome, in_play, player_hand,dealer_hand
 
-    # your code goes here
-
+    global outcome, prompt, wins, losses, in_play, deck, dealer_hand, player_hand
+    outcome = ""
+    if in_play:
+        losses += 1
+    else:
+        in_play = True
+    deck = Deck()
+    deck.shuffle()
+    dealer_hand = Hand()
+    player_hand = Hand()
+    dealer_hand.add_card(deck.deal_card())
+    player_hand.add_card(deck.deal_card())
+    dealer_hand.add_card(deck.deal_card())
+    player_hand.add_card(deck.deal_card())
     in_play = True
+    prompt = "Hit or stand?"
 
 def hit():
     pass	# replace with your code below
@@ -110,11 +196,36 @@ def stand():
 
 # draw handler
 def draw(canvas):
-    # test to make sure that card.draw works, replace with your code below
+    global  player_hand , dealer_hand, in_play, losses
 
-    #card = Card("S", "A")
-    card = Card("D", "2")
-    card.draw(canvas, [300, 300])
+    if in_play:
+        losses += 1
+    else:
+        in_play = True
+    canvas.draw_text('Black Jack', (50,50),24 ,'Black')
+    if in_play:
+        dealer_hand.draw(canvas, True, [100,100])
+        canvas.draw_image(card_back, (CARD_CENTER[0], CARD_CENTER[1]), CARD_SIZE, [100 + CARD_CENTER[0], 100 + CARD_CENTER[1]], CARD_SIZE)
+    else:
+        # show hole card if player hand not in play
+        dealer_hand.draw(canvas, False, [100,100])
+        # draw dealer_hand value
+        canvas.draw_text("("+str(dealer_hand.get_value())+")", (60, 150), 18, 'White', 'serif')
+    player_hand.draw(canvas, False, [100,400])
+    # draw player_hand value
+    canvas.draw_text("("+str(player_hand.get_value())+")", (60, 450), 18, 'White', 'serif')
+    # card = Card("D", "2")
+    # #card.draw(canvas, [300, 300])
+    # deck = Deck()
+    # deck.shuffle()
+    # player_hand = Hand((150,150))
+    # #for i in range(2):
+    # play_card = deck.deal_card()
+    # player_hand.add_card(play_card)
+    # player_hand.draw(canvas)
+    # #player_hand.draw(canvas , (150,150))
+
+    in_play = True
 
 
 # initialization frame
@@ -123,8 +234,10 @@ frame.set_canvas_background("Green")
 
 #create buttons and canvas callback
 frame.add_button("Deal", deal, 200)
+
 frame.add_button("Hit",  hit, 200)
 frame.add_button("Stand", stand, 200)
+
 frame.set_draw_handler(draw)
 
 

@@ -113,7 +113,8 @@ class Hand(object):
         #return  card_sum
 
     def draw(self, canvas, pos):
-        pass	# draw a hand on the canvas, use the draw method for cards
+       # draw a hand on the canvas, use the draw method for cards
+
 
 class Deck(object):
     def __init__(self):
@@ -148,12 +149,15 @@ def deal():
     deck.shuffle()
     for i in range(2):
         player_hand.add_card(deck.deal_card())
-        #deck.deck_hand.pop(player_hand[i])
+        deck.deck_hand.remove(
+
+        )
         dealer_hand.add_card( deck.deal_card())
 
     if in_play:
         if player_hand.get_value() <= 21:
             player_hand.add_card(deck.deal_card())
+
             print player_hand
         else :
             print 'BUST'
